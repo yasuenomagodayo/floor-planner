@@ -8,7 +8,7 @@ let floorImage = null;
 // 家具データ
 let furniture = [];
 
-// 縮尺
+// 縮尺（1mmあたり何pxか）
 let pxPerMm = null;
 
 // 選択中家具
@@ -18,9 +18,6 @@ let selectedItem = null;
 let draggingItem = null;
 let offsetX = 0;
 let offsetY = 0;
-
-// スマホ対応用
-let isTouch = false;
 
 // 縮尺設定用
 let scaleMode = false;
@@ -38,6 +35,7 @@ document.getElementById("goStep2").addEventListener("click", () => {
   document.getElementById("step1").style.display = "none";
   document.getElementById("step2").style.display = "block";
 });
+
 document.getElementById("goStep3").addEventListener("click", () => {
   document.getElementById("step2").style.display = "none";
   document.getElementById("step3").style.display = "block";
@@ -53,13 +51,16 @@ document.getElementById("floorImageInput").addEventListener("change", e => {
     floorImage = img;
     canvas.width = img.width;
     canvas.height = img.height;
+
     draw();
+
+    // STEP1 → STEP2 を有効化
     document.getElementById("goStep2").disabled = false;
   };
   img.src = URL.createObjectURL(file);
 });
 
-// 縮尺設定
+// 縮尺設定ボタン
 document.getElementById("setScaleBtn").addEventListener("click", () => {
   scaleMode = true;
   scaleStart = null;
@@ -68,32 +69,42 @@ document.getElementById("setScaleBtn").addEventListener("click", () => {
     "縮尺設定モード：線の始点をクリックしてください。";
 });
 
-// PC + スマホ共通の座標取得
+// PC + スマホ共通座標取得
 function getPos(e) {
   const rect = canvas.getBoundingClientRect();
-  if (e.touches) {
-    isTouch = true;
+  if (e.touches && e.touches.length > 0) {
     return {
       x: e.touches[0].clientX - rect.left,
       y: e.touches[0].clientY - rect.top
     };
+  } else {
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
   }
-  return {
-    x: e.clientX - rect.left,
-    y: e.clientY - rect.top
-  };
 }
 
-// PC + スマホ共通のイベント
+// イベント登録（PC + スマホ）
 canvas.addEventListener("mousedown", startDrag);
 canvas.addEventListener("mousemove", moveDrag);
 canvas.addEventListener("mouseup", endDrag);
+canvas.addEventListener("mouseleave", endDrag);
 
-canvas.addEventListener("touchstart", startDrag);
-canvas.addEventListener("touchmove", moveDrag);
-canvas.addEventListener("touchend", endDrag);
+canvas.addEventListener("touchstart", e => {
+  e.preventDefault();
+  startDrag(e);
+});
+canvas.addEventListener("touchmove", e => {
+  e.preventDefault();
+  moveDrag(e);
+});
+canvas.addEventListener("touchend", e => {
+  e.preventDefault();
+  endDrag(e);
+});
 
-// ドラッグ開始
+// ドラッグ開始 & 縮尺設定 & 回転アイコン
 function startDrag(e) {
   const pos = getPos(e);
 
@@ -115,7 +126,7 @@ function startDrag(e) {
       if (mm > 0) {
         pxPerMm = distPx / mm;
         document.getElementById("scaleInfo").textContent =
-          `縮尺設定完了：1mm ≒ ${pxPerMm.toFixed(4)} px`;
+          `縮尺設定完了：1mm ≒ ${pxPerMm.toFixed(4)} px（推定値）`;
         document.getElementById("goStep3").disabled = false;
       } else {
         alert("正しいmmを入力してください");
@@ -127,8 +138,10 @@ function startDrag(e) {
     return;
   }
 
-  // 家具選択
+  // 家具選択 & 回転アイコン判定
   selectedItem = null;
+  draggingItem = null;
+
   for (const item of furniture) {
     if (hitItem(item, pos.x, pos.y)) {
       selectedItem = item;
@@ -176,14 +189,16 @@ function hitItem(item, x, y) {
   );
 }
 
-// 回転アイコンの当たり判定
+// 回転アイコン当たり判定
 function hitRotateIcon(item, x, y) {
   const iconSize = 24;
+  const ix = item.x + item.width - iconSize;
+  const iy = item.y;
   return (
-    x >= item.x + item.width - iconSize &&
-    x <= item.x + item.width &&
-    y >= item.y &&
-    y <= item.y + iconSize
+    x >= ix &&
+    x <= ix + iconSize &&
+    y >= iy &&
+    y <= iy + iconSize
   );
 }
 
@@ -224,11 +239,17 @@ const presets = {
 document.querySelectorAll(".presetBtn").forEach(btn => {
   btn.addEventListener("click", () => {
     const p = presets[btn.dataset.type];
-    addFurnitureFromMm(`${p.label}（${p.w}×${p.h}mm）`, p.w, p.h, currentColor, p.type);
+    addFurnitureFromMm(
+      `${p.label}（${p.w}×${p.h}mm）`,
+      p.w,
+      p.h,
+      currentColor,
+      p.type
+    );
   });
 });
 
-// ベッド
+// ベッド（日本サイズ）
 document.getElementById("addBedBtn").addEventListener("click", () => {
   const v = document.getElementById("bedSizeSelect").value;
   const sizes = {
@@ -259,6 +280,11 @@ document.getElementById("addCustomFurnitureBtn").addEventListener("click", () =>
   const hMm = parseFloat(document.getElementById("customHeightMm").value);
   const color = document.getElementById("customColor").value;
 
+  if (!wMm || !hMm || wMm <= 0 || hMm <= 0) {
+    alert("幅と奥行(mm)を正しく入力してください");
+    return;
+  }
+
   addFurnitureFromMm(`${name}（${wMm}×${hMm}mm）`, wMm, hMm, color, "custom");
 });
 
@@ -269,7 +295,7 @@ function drawFurnitureIcon(item) {
 
   ctx.save();
   ctx.translate(item.x + w / 2, item.y + h / 2);
-  ctx.rotate(item.rotation);
+  ctx.rotate(item.rotation || 0);
   ctx.translate(-w / 2, -h / 2);
 
   // 本体
@@ -279,7 +305,6 @@ function drawFurnitureIcon(item) {
   ctx.strokeStyle = "rgba(0,0,0,0.5)";
   ctx.lineWidth = 2;
 
-  // 家具ごとの描画
   switch (item.type) {
     case "bed":
       ctx.strokeRect(4, 4, w - 8, h - 8);
@@ -338,10 +363,57 @@ function drawFurnitureIcon(item) {
   ctx.font = "12px sans-serif";
   ctx.fillText(item.label, 6, 18);
 
-  // 回転アイコン
+  // 回転アイコン（右上）
+  const iconSize = 24;
   ctx.fillStyle = "rgba(0,0,0,0.7)";
   ctx.beginPath();
-  ctx.arc(w - 12, 12, 10, 0, Math.PI * 2);
+  ctx.arc(w - iconSize / 2, iconSize / 2, iconSize / 2 - 2, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.fillStyle
+  ctx.fillStyle = "white";
+  ctx.font = "14px sans-serif";
+  ctx.fillText("↻", w - iconSize + 6, iconSize / 2 + 5);
+
+  // 選択中なら枠を強調
+  if (item === selectedItem) {
+    ctx.strokeStyle = "yellow";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(2, 2, w - 4, h - 4);
+  }
+
+  ctx.restore();
+}
+
+// 描画
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (floorImage) {
+    ctx.drawImage(floorImage, 0, 0);
+  }
+
+  // 縮尺の赤点・赤線
+  if (scaleStart) {
+    ctx.fillStyle = "red";
+    ctx.beginPath();
+    ctx.arc(scaleStart.x, scaleStart.y, 4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  if (scaleEnd) {
+    ctx.fillStyle = "red";
+    ctx.beginPath();
+    ctx.arc(scaleEnd.x, scaleEnd.y, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = "red";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(scaleStart.x, scaleStart.y);
+    ctx.lineTo(scaleEnd.x, scaleEnd.y);
+    ctx.stroke();
+  }
+
+  furniture.forEach(item => {
+    drawFurnitureIcon(item);
+  });
+}
