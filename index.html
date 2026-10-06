@@ -7,67 +7,30 @@
 </head>
 <body>
 
-<h2>間取り図アップロード</h2>
-<input type="file" id="floorImageInput" accept="image/*">
+<h1>間取り図プランナー</h1>
 
-<h2>縮尺合わせ（スケール設定）</h2>
-<button id="setScaleBtn">縮尺を設定する（線を2点クリック）</button>
-<div id="scaleInfo">まだ縮尺は設定されていません。</div>
+<!-- STEP 1 -->
+<div class="step" id="step1">
+  <h2>STEP 1：間取り図をアップロード</h2>
+  <input type="file" id="floorImageInput" accept="image/*">
+  <button id="goStep2" class="nextBtn" disabled>次へ</button>
+</div>
 
-<h2>家具操作</h2>
-<button id="rotateSelectedBtn">選択中の家具を90°回転</button>
+<!-- STEP 2 -->
+<div class="step" id="step2" style="display:none;">
+  <h2>STEP 2：縮尺を設定（赤点・赤線で表示）</h2>
+  <button id="setScaleBtn">縮尺を設定する（線を2点クリック）</button>
+  <div id="scaleInfo">まだ縮尺は設定されていません。</div>
+  <button id="goStep3" class="nextBtn" disabled>次へ</button>
+</div>
 
-<h2>家具パレット</h2>
+<!-- STEP 3 -->
+<div class="step" id="step3" style="display:none;">
+  <h2>STEP 3：家具を追加・操作</h2>
 
-<div class="palette-block">
+  <h3>家具の基本色</h3>
+  <input type="color" id="colorPicker" value="#888888">
+
   <h3>ベッド（日本サイズ）</h3>
   <select id="bedSizeSelect">
-    <option value="single">シングル（970×1950mm）</option>
-    <option value="semi">セミダブル（1200×1950mm）</option>
-    <option value="double">ダブル（1400×1950mm）</option>
-  </select>
-  <button id="addBedBtn">ベッドを追加</button>
-</div>
-
-<div class="palette-block">
-  <h3>ソファ</h3>
-  <select id="sofaSeatSelect">
-    <option value="1">1人掛け（800×800mm）</option>
-    <option value="2">2人掛け（1400×800mm）</option>
-    <option value="3">3人掛け（1800×800mm）</option>
-  </select>
-  <button id="addSofaBtn">ソファを追加</button>
-</div>
-
-<div class="palette-block">
-  <h3>その他の家具</h3>
-  <button class="presetBtn" data-type="desk">机（1200×600mm）</button>
-  <button class="presetBtn" data-type="studyDesk">勉強机（1000×600mm）</button>
-  <button class="presetBtn" data-type="chair">椅子（400×400mm）</button>
-  <button class="presetBtn" data-type="fridgeSmall">冷蔵庫（小：480×600mm）</button>
-  <button class="presetBtn" data-type="fridgeLarge">冷蔵庫（大：600×700mm）</button>
-  <button class="presetBtn" data-type="washer">洗濯機（600×600mm）</button>
-</div>
-
-<h2>自分で家具を作る</h2>
-<div class="custom-block">
-  <label>名前：</label>
-  <input type="text" id="customName" placeholder="例：本棚"><br>
-  <label>幅(mm)：</label>
-  <input type="number" id="customWidthMm" placeholder="例：800"><br>
-  <label>奥行(mm)：</label>
-  <input type="number" id="customHeightMm" placeholder="例：300"><br>
-  <label>色：</label>
-  <input type="color" id="customColor" value="#888888"><br>
-  <button id="addCustomFurnitureBtn">この寸法で家具を追加</button>
-</div>
-
-<h2>家具の基本色</h2>
-<input type="color" id="colorPicker" value="#888888">
-
-<h2>キャンバス</h2>
-<canvas id="floorCanvas"></canvas>
-
-<script src="app.js"></script>
-</body>
-</html>
+    <option value="single">シングル（970×1950mm）
