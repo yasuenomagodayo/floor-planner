@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>Floor Planner</title>
+  <title>間取り図プランナー</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -33,4 +33,23 @@
 
   <h3>ベッド（日本サイズ）</h3>
   <select id="bedSizeSelect">
-    <option value="single">シングル（970×1950mm）
+    <option value="single">シングル（970×1950mm）</option>
+    <option value="semi">セミダブル（1200×1950mm）</option>
+    <option value="double">ダブル（1400×1950mm）</option>
+  </select>
+  <button id="addBedBtn">ベッドを追加</button>
+
+  <h3>ソファ</h3>
+  <select id="sofaSeatSelect">
+    <option value="1">1人掛け（800×800mm）</option>
+    <option value="2">2人掛け（1400×800mm）</option>
+    <option value="3">3人掛け（1800×800mm）</option>
+  </select>
+  <button id="addSofaBtn">ソファを追加</button>
+
+  <h3>その他の家具</h3>
+  <button class="presetBtn" data-type="desk">机（1200×600mm）</button>
+  <button class="presetBtn" data-type="studyDesk">勉強机（1000×600mm）</button>
+  <button class="presetBtn" data-type="chair">椅子（400×400mm）</button>
+  <button class="presetBtn" data-type="fridgeSmall">冷蔵庫（小：480×600mm）</button>
+  <button class="presetBtn" data-type="fridgeLarge">冷蔵庫（大：600×700mm）
