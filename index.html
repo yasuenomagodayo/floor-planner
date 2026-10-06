@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>間取り家具プランナー</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <header>
+    <h1>間取り家具プランナー（スマホ対応版）</h1>
+  </header>
+
+  <main>
+    <section class="controls">
+      <div class="block">
+        <h2>1. 間取り画像アップロード</h2>
+        <input type="file" id="floorImageInput" accept="image/*" />
+      </div>
+
+      <div class="block">
+        <h2>2. スケール設定</h2>
+        <p>キャンバス上で2点タップして基準線を引き、実寸(cm)を入力してください。</p>
+        <label>基準線の長さ (cm):
+          <input type="number" id="scaleCmInput" value="300" />
+        </label>
+        <button id="setScaleBtn">スケール確定</button>
+        <p id="scaleInfo">現在: 未設定</p>
+      </div>
+
+      <div class="block">
+        <h2>3. 家具パレット</h2>
+        <div id="palette">
+          <button class="palette-item" data-type="desk" data-width="120" data-depth="60">机 120×60</button>
+          <button class="palette-item" data-type="chair" data-width="45" data-depth="45">椅子 45×45</button>
+          <button class="palette-item" data-type="sofa" data-width="180" data-depth="80">ソファ 180×80</button>
+          <button class="palette-item" data-type="fridge" data-width="70" data-depth="70">冷蔵庫 70×70</button>
+          <button class="palette-item" data-type="washer" data-width="60" data-depth="60">洗濯機 60×60</button>
+        </div>
+
+        <h3>カスタム家具を追加</h3>
+        <label>名前: <input type="text" id="customName" /></label>
+        <label>幅(cm): <input type="number" id="customWidth" value="100" /></label>
+        <label>奥行(cm): <input type="number" id="customDepth" value="50" /></label>
+        <button id="addCustomFurnitureBtn">追加</button>
+      </div>
+    </section>
+
+    <section class="canvas-section">
+      <h2>キャンバス</h2>
+      <canvas id="floorCanvas" width="900" height="600"></canvas>
+      <p>
+        操作：  
+        - タップで選択  
+        - スワイプで移動  
+        - ピンチでズーム  
+        - 2本指で回転  
+        - 四隅のハンドルでサイズ変更  
+      </p>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
