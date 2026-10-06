@@ -20,6 +20,10 @@ h1 {
   font-size: 16px;
 }
 
+button {
+  touch-action: manipulation; /* スマホでボタンが押せない問題を防ぐ */
+}
+
 .presetBtn {
   margin: 4px;
   padding: 6px 10px;
@@ -29,5 +33,11 @@ h1 {
 #floorCanvas {
   border: 1px solid #333;
   margin-top: 10px;
-  touch-action: none;
+  touch-action: none; /* スマホでドラッグ可能にする */
+}
+
+#scaleInfo {
+  margin-top: 5px;
+  font-size: 14px;
+  color: #555;
 }
