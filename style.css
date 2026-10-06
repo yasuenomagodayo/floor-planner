@@ -3,16 +3,29 @@ body {
   padding: 20px;
 }
 
-#palette {
-  margin-bottom: 20px;
+h2 {
+  margin-top: 20px;
 }
 
-.palette-item {
-  margin-right: 10px;
-  padding: 8px 12px;
+.palette-block, .custom-block {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.presetBtn {
+  margin: 4px;
+  padding: 6px 10px;
   cursor: pointer;
 }
 
 #floorCanvas {
   border: 1px solid #333;
+  margin-top: 10px;
+}
+
+#scaleInfo {
+  margin-top: 5px;
+  font-size: 14px;
+  color: #555;
 }
