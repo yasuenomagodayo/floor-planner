@@ -29,6 +29,12 @@ let scaleMode = false;
 let scaleStart = null;
 let scaleEnd = null;
 
+// 色
+let currentColor = "#888888";
+document.getElementById("colorPicker").addEventListener("change", e => {
+  currentColor = e.target.value;
+});
+
 // STEP UI
 const step1 = document.getElementById("step1");
 const step2 = document.getElementById("step2");
@@ -55,12 +61,8 @@ function showStep(n) {
   step2.style.display = n === 2 ? "block" : "none";
   step3.style.display = n === 3 ? "block" : "none";
 
-  // スクロール制御
-  if (n === 1 || n === 2) {
-    canvas.style.touchAction = "auto"; // スクロール可能
-  } else {
-    canvas.style.touchAction = "auto"; // STEP3でも通常はスクロール可能
-  }
+  // スクロール制御（基本はauto、操作中のみnoneにする）
+  canvas.style.touchAction = "auto";
 }
 
 // STEP1 → STEP2
@@ -75,6 +77,7 @@ document.getElementById("backToStep1").addEventListener("pointerdown", () => {
 
 // STEP2 → STEP3
 document.getElementById("goStep3").addEventListener("pointerdown", () => {
+  // STEP3に進むときに縮尺線を消す
   scaleStart = null;
   scaleEnd = null;
   showStep(3);
@@ -110,7 +113,12 @@ document.getElementById("loadProjectInputStep1").addEventListener("change", e =>
 
   const reader = new FileReader();
   reader.onload = () => {
-    loadProject(JSON.parse(reader.result));
+    try {
+      const project = JSON.parse(reader.result);
+      loadProject(project);
+    } catch {
+      alert("プロジェクトファイルの読み込みに失敗しました。");
+    }
   };
   reader.readAsText(file);
 });
@@ -122,12 +130,17 @@ document.getElementById("loadProjectInput").addEventListener("change", e => {
 
   const reader = new FileReader();
   reader.onload = () => {
-    loadProject(JSON.parse(reader.result));
+    try {
+      const project = JSON.parse(reader.result);
+      loadProject(project);
+    } catch {
+      alert("プロジェクトファイルの読み込みに失敗しました。");
+    }
   };
   reader.readAsText(file);
 });
 
-// プロジェクト読み込み処理
+// プロジェクト読み込み処理（STEP1/STEP3共通）
 function loadProject(project) {
   pxPerMm = project.scale || null;
   furniture = project.furniture || [];
@@ -138,13 +151,22 @@ function loadProject(project) {
       floorImage = img;
       canvas.width = img.width;
       canvas.height = img.height;
-      showStep(3);
+
       draw();
+
+      // 間取り図が復元されたのでSTEP2へ進める条件を満たす
+      document.getElementById("goStep2").disabled = false;
+
+      // 読み込んだらすぐ編集できるようSTEP3へ
+      showStep(3);
     };
     img.src = project.floorImage;
   } else {
+    // 間取り図がないプロジェクトでも家具だけで編集可能
     showStep(3);
     draw();
+
+    document.getElementById("goStep2").disabled = false;
   }
 }
 
@@ -163,7 +185,7 @@ canvas.addEventListener("pointermove", movePointer);
 canvas.addEventListener("pointerup", endPointer);
 canvas.addEventListener("pointerleave", endPointer);
 
-// 右クリック回転
+// 右クリック回転（PC）
 canvas.addEventListener("contextmenu", e => {
   e.preventDefault();
 });
@@ -209,7 +231,6 @@ function startPointer(e) {
   rotationMode = false;
   rotationTarget = null;
 
-  // 家具選択判定
   for (const item of furniture) {
     if (hitItem(item, pos.x, pos.y)) {
       selectedItem = item;
@@ -220,12 +241,13 @@ function startPointer(e) {
       const edgeMargin = Math.min(item.width, item.height) * 0.2;
 
       if (dist < Math.min(item.width, item.height) / 2 - edgeMargin) {
+        // 中央 → 移動
         draggingItem = item;
         offsetX = pos.x - item.x;
         offsetY = pos.y - item.y;
-
         canvas.style.touchAction = "none"; // 家具操作中はスクロール禁止
       } else {
+        // 端 → 回転候補（長押し）
         rotationTarget = item;
         longPressTimer = setTimeout(() => {
           rotationMode = true;
@@ -234,6 +256,18 @@ function startPointer(e) {
         }, LONG_PRESS_MS);
       }
       break;
+    }
+  }
+
+  // PC右クリックなら即回転モード
+  if (e.button === 2 && selectedItem) {
+    rotationMode = true;
+    rotationTarget = selectedItem;
+    draggingItem = null;
+    canvas.style.touchAction = "none";
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
     }
   }
 
@@ -478,6 +512,7 @@ function draw() {
     ctx.drawImage(floorImage, 0, 0);
   }
 
+  // 縮尺線はSTEP2のときだけ表示
   if (scaleStart && step2.style.display === "block") {
     ctx.fillStyle = "red";
     ctx.beginPath();
@@ -504,4 +539,55 @@ function draw() {
 
 // PNG保存
 document.getElementById("saveImageBtn").addEventListener("click", () => {
-  const dataUrl = canvas
+  const dataUrl = canvas.toDataURL("image/png");
+  const a = document.createElement("a");
+  a.href = dataUrl;
+  a.download = "floorplan.png";
+  a.click();
+});
+
+// 画像共有（Web Share API）
+document.getElementById("shareImageBtn").addEventListener("click", async () => {
+  try {
+    const dataUrl = canvas.toDataURL("image/png");
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    const file = new File([blob], "floorplan.png", { type: "image/png" });
+
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        title: "間取り図",
+        text: "間取り図プランナーで作成したキャンバスです。",
+        files: [file]
+      });
+    } else {
+      alert("このブラウザは画像の共有に対応していません。PNG保存してから手動で共有してください。");
+    }
+  } catch {
+    alert("共有に失敗しました。");
+  }
+});
+
+// プロジェクト保存（JSON）
+document.getElementById("saveProjectBtn").addEventListener("click", () => {
+  if (!floorImage) {
+    alert("まず間取り図をアップロードしてください。");
+    return;
+  }
+
+  const project = {
+    scale: pxPerMm,
+    furniture,
+    floorImage: canvas.toDataURL("image/png")
+  };
+
+  const blob = new Blob([JSON.stringify(project)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "floorplan_project.json";
+  a.click();
+});
+
+// 初期表示
+showStep(1);
+draw();
