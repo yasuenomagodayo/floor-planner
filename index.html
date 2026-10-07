@@ -9,24 +9,43 @@
 
 <h1>間取り図プランナー</h1>
 
+<!-- 使い方 -->
+<div class="help">
+  <h2>使い方</h2>
+  <ol>
+    <li>STEP1：間取り図画像をアップロード</li>
+    <li>STEP2：縮尺を設定（2点をタップして実寸mmを入力）</li>
+    <li>STEP3：家具を追加・移動・回転・削除</li>
+    <li>保存：画像保存 or プロジェクト保存(JSON)</li>
+    <li>読み込み：保存したJSONを読み込んで編集再開</li>
+    <li>共有：画像をLINEやSNSで共有</li>
+  </ol>
+</div>
+
 <!-- STEP 1 -->
 <div class="step" id="step1">
   <h2>STEP 1：間取り図をアップロード</h2>
   <input type="file" id="floorImageInput" accept="image/*">
-  <button id="goStep2" class="nextBtn" disabled>次へ</button>
+  <div class="stepButtons">
+    <button id="goStep2" class="nextBtn" disabled>次へ（STEP2へ）</button>
+  </div>
 </div>
 
 <!-- STEP 2 -->
 <div class="step" id="step2" style="display:none;">
   <h2>STEP 2：縮尺を設定（赤点・赤線で表示）</h2>
+  <p>キャンバス上で2点をタップして、その距離の実寸(mm)を入力してください。</p>
   <button id="setScaleBtn">縮尺を設定する（線を2点クリック）</button>
   <div id="scaleInfo">まだ縮尺は設定されていません。</div>
-  <button id="goStep3" class="nextBtn" disabled>次へ</button>
+  <div class="stepButtons">
+    <button id="backToStep1" class="backBtn">戻る（STEP1へ）</button>
+    <button id="goStep3" class="nextBtn" disabled>次へ（STEP3へ）</button>
+  </div>
 </div>
 
 <!-- STEP 3 -->
 <div class="step" id="step3" style="display:none;">
-  <h2>STEP 3：家具を追加・操作</h2>
+  <h2>STEP 3：家具を追加・操作・保存・共有</h2>
 
   <h3>家具の基本色</h3>
   <input type="color" id="colorPicker" value="#888888">
@@ -52,4 +71,38 @@
   <button class="presetBtn" data-type="studyDesk">勉強机（1000×600mm）</button>
   <button class="presetBtn" data-type="chair">椅子（400×400mm）</button>
   <button class="presetBtn" data-type="fridgeSmall">冷蔵庫（小：480×600mm）</button>
-  <button class="presetBtn" data-type="fridgeLarge">冷蔵庫（大：600×700mm）
+  <button class="presetBtn" data-type="fridgeLarge">冷蔵庫（大：600×700mm）</button>
+  <button class="presetBtn" data-type="washer">洗濯機（600×600mm）</button>
+
+  <h3>自分で家具を作る</h3>
+  <label>名前：</label>
+  <input type="text" id="customName"><br>
+  <label>幅(mm)：</label>
+  <input type="number" id="customWidthMm"><br>
+  <label>奥行(mm)：</label>
+  <input type="number" id="customHeightMm"><br>
+  <label>色：</label>
+  <input type="color" id="customColor" value="#888888"><br>
+  <button id="addCustomFurnitureBtn">追加</button>
+
+  <h3>選択中の家具操作</h3>
+  <button id="deleteSelectedBtn" class="dangerBtn" disabled>選択中の家具を削除</button>
+
+  <h3>キャンバス保存・共有・読み込み</h3>
+  <button id="saveImageBtn">画像として保存（PNG）</button>
+  <button id="shareImageBtn">画像を共有（LINE/SNSなど）</button>
+  <button id="saveProjectBtn">プロジェクト保存（JSON）</button>
+  <input type="file" id="loadProjectInput" accept="application/json">
+  <label for="loadProjectInput" class="fileLabel">プロジェクト読み込み（JSON）</label>
+
+  <div class="stepButtons">
+    <button id="backToStep2" class="backBtn">戻る（STEP2へ）</button>
+  </div>
+</div>
+
+<h2>キャンバス</h2>
+<canvas id="floorCanvas"></canvas>
+
+<script src="app.js"></script>
+</body>
+</html>
