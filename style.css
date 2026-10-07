@@ -1,6 +1,7 @@
 body {
   font-family: sans-serif;
   padding: 20px;
+  margin: 0;
 }
 
 h1 {
@@ -14,30 +15,80 @@ h1 {
   background: #f9f9f9;
 }
 
-.nextBtn {
+.stepButtons {
   margin-top: 10px;
+}
+
+.nextBtn,
+.backBtn,
+.dangerBtn,
+.presetBtn,
+.fileLabel {
+  margin: 4px;
   padding: 8px 12px;
-  font-size: 16px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.dangerBtn {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+}
+
+.backBtn {
+  background-color: #bdc3c7;
+  border: none;
+}
+
+.nextBtn {
+  background-color: #3498db;
+  color: white;
+  border: none;
 }
 
 button {
-  touch-action: manipulation; /* スマホでボタンが押せない問題を防ぐ */
+  touch-action: manipulation;
+  pointer-events: auto;
 }
 
 .presetBtn {
-  margin: 4px;
-  padding: 6px 10px;
-  cursor: pointer;
+  background-color: #ecf0f1;
+  border: 1px solid #ccc;
+}
+
+.fileLabel {
+  display: inline-block;
+  background-color: #2ecc71;
+  color: white;
+  border-radius: 4px;
+}
+
+#loadProjectInput {
+  display: none;
 }
 
 #floorCanvas {
   border: 1px solid #333;
   margin-top: 10px;
-  touch-action: none; /* スマホでドラッグ可能にする */
+  max-width: 100%;
+  touch-action: none; /* STEP3でドラッグ・回転に使う */
 }
 
 #scaleInfo {
   margin-top: 5px;
   font-size: 14px;
   color: #555;
+}
+
+.help {
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 20px;
+  background: #fcfcfc;
+}
+
+.help ol {
+  margin: 0;
+  padding-left: 20px;
 }
