@@ -22,6 +22,11 @@ let scaleMode = false;
 let scaleStart = null;
 let scaleEnd = null;
 
+let currentColor = "#888888";
+document.getElementById("colorPicker").addEventListener("change", e => {
+  currentColor = e.target.value;
+});
+
 // ===============================
 // スマホ座標ズレ補正
 // ===============================
@@ -306,7 +311,7 @@ function distance(x1, y1, x2, y2) {
 
 // ===============================
 // 家具追加（mm → px）
-function addFurnitureFromMm(label, wMm, hMm, type) {
+function addFurnitureFromMm(label, wMm, hMm, type, color) {
   if (!pxPerMm) {
     alert("先に縮尺を設定してください");
     return;
@@ -317,8 +322,8 @@ function addFurnitureFromMm(label, wMm, hMm, type) {
     y: 50,
     width: wMm * pxPerMm,
     height: hMm * pxPerMm,
-    color: "#888888",
-    label,
+    color,
+    label: `${label}（${wMm}×${hMm}mm）`,
     type,
     rotation: 0
   });
@@ -327,24 +332,65 @@ function addFurnitureFromMm(label, wMm, hMm, type) {
 }
 
 // ===============================
-// 家具追加パネル
+// 家具追加（ベッド）
+document.getElementById("addBedBtn").addEventListener("click", () => {
+  const v = document.getElementById("bedSizeSelect").value;
+  const sizes = {
+    single: { w: 970, h: 1950, label: "ベッド（シングル）" },
+    semi: { w: 1200, h: 1950, label: "ベッド（セミダブル）" },
+    double: { w: 1400, h: 1950, label: "ベッド（ダブル）" }
+  };
+  const s = sizes[v];
+  addFurnitureFromMm(s.label, s.w, s.h, "bed", currentColor);
+});
+
 // ===============================
-document.querySelectorAll(".addBtn").forEach(btn => {
+// 家具追加（ソファ）
+document.getElementById("addSofaBtn").addEventListener("click", () => {
+  const v = document.getElementById("sofaSeatSelect").value;
+  const sizes = {
+    1: { w: 800, h: 800, label: "ソファ（1人掛け）" },
+    2: { w: 1400, h: 800, label: "ソファ（2人掛け）" },
+    3: { w: 1800, h: 800, label: "ソファ（3人掛け）" }
+  };
+  const s = sizes[v];
+  addFurnitureFromMm(s.label, s.w, s.h, "sofa", currentColor);
+});
+
+// ===============================
+// プリセット家具
+// ===============================
+const presets = {
+  desk: { w: 1200, h: 600, label: "机" },
+  studyDesk: { w: 1000, h: 600, label: "勉強机" },
+  chair: { w: 400, h: 400, label: "椅子" },
+  fridgeSmall: { w: 480, h: 600, label: "冷蔵庫（小）" },
+  fridgeLarge: { w: 600, h: 700, label: "冷蔵庫（大）" },
+  washer: { w: 600, h: 600, label: "洗濯機" }
+};
+
+document.querySelectorAll(".presetBtn").forEach(btn => {
   btn.addEventListener("click", () => {
-    const type = btn.dataset.type;
-
-    const sizes = {
-      bed: { w: 970, h: 1950, label: "ベッド" },
-      sofa: { w: 1400, h: 800, label: "ソファ" },
-      desk: { w: 1200, h: 600, label: "机" },
-      chair: { w: 400, h: 400, label: "椅子" },
-      fridge: { w: 600, h: 700, label: "冷蔵庫" },
-      washer: { w: 600, h: 600, label: "洗濯機" }
-    };
-
-    const s = sizes[type];
-    addFurnitureFromMm(`${s.label}`, s.w, s.h, type);
+    const p = presets[btn.dataset.type];
+    addFurnitureFromMm(p.label, p.w, p.h, btn.dataset.type, currentColor);
   });
+});
+
+// ===============================
+// 自作家具
+// ===============================
+document.getElementById("addCustomFurnitureBtn").addEventListener("click", () => {
+  const name = document.getElementById("customName").value || "家具";
+  const wMm = parseFloat(document.getElementById("customWidthMm").value);
+  const hMm = parseFloat(document.getElementById("customHeightMm").value);
+  const color = document.getElementById("customColor").value;
+
+  if (!wMm || !hMm || wMm <= 0 || hMm <= 0) {
+    alert("幅と奥行(mm)を正しく入力してください");
+    return;
+  }
+
+  addFurnitureFromMm(name, wMm, hMm, "custom", color);
 });
 
 // ===============================
@@ -363,7 +409,7 @@ function updateDeleteButtonState() {
 }
 
 // ===============================
-// 家具描画
+// 家具描画（寸法表示付き）
 // ===============================
 function drawFurnitureIcon(item) {
   const w = item.width;
@@ -380,6 +426,7 @@ function drawFurnitureIcon(item) {
   ctx.strokeStyle = "rgba(0,0,0,0.5)";
   ctx.strokeRect(0, 0, w, h);
 
+  // 寸法表示
   ctx.fillStyle = "white";
   ctx.font = "12px sans-serif";
   ctx.fillText(item.label, 6, 18);
