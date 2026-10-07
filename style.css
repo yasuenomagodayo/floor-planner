@@ -39,9 +39,9 @@ body {
   display: none;
 }
 
-/* ★ canvasを縮小しない（座標ズレ防止） */
+/* ★ canvasを縮小しない（スマホでも内部サイズ＝表示サイズ） */
 #floorCanvas {
   border: 1px solid #333;
   margin-top: 10px;
-  touch-action: auto; /* スクロール可能 */
+  touch-action: auto;
 }
