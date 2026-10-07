@@ -62,6 +62,7 @@ button {
   background-color: #2ecc71;
   color: white;
   border-radius: 4px;
+  padding: 6px 10px;
 }
 
 #loadProjectInput,
@@ -73,7 +74,7 @@ button {
   border: 1px solid #333;
   margin-top: 10px;
   max-width: 100%;
-  touch-action: auto; /* ← スクロール可能にする */
+  touch-action: auto; /* スクロール可能（操作中のみJSでnoneに切り替え） */
 }
 
 #scaleInfo {
