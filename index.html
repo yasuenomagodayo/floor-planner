@@ -13,19 +13,23 @@
 <div class="help">
   <h2>使い方</h2>
   <ol>
-    <li>STEP1：間取り図画像をアップロード</li>
-    <li>STEP2：縮尺を設定（2点をタップして実寸mmを入力）</li>
-    <li>STEP3：家具を追加・移動・回転・削除</li>
-    <li>保存：画像保存 or プロジェクト保存(JSON)</li>
-    <li>読み込み：保存したJSONを読み込んで編集再開</li>
-    <li>共有：画像をLINEやSNSで共有</li>
+    <li>STEP1：間取り図画像をアップロード or プロジェクト読み込み</li>
+    <li>STEP2：縮尺を設定（2点タップ → 実寸mm入力）</li>
+    <li>STEP3：家具追加・移動・回転・削除・保存・共有</li>
   </ol>
 </div>
 
 <!-- STEP 1 -->
 <div class="step" id="step1">
-  <h2>STEP 1：間取り図をアップロード</h2>
+  <h2>STEP 1：間取り図をアップロード / プロジェクト読み込み</h2>
+
+  <h3>間取り図アップロード</h3>
   <input type="file" id="floorImageInput" accept="image/*">
+
+  <h3>プロジェクト読み込み（JSON）</h3>
+  <input type="file" id="loadProjectInputStep1" accept="application/json">
+  <label for="loadProjectInputStep1" class="fileLabel">プロジェクト読み込み</label>
+
   <div class="stepButtons">
     <button id="goStep2" class="nextBtn" disabled>次へ（STEP2へ）</button>
   </div>
@@ -37,6 +41,7 @@
   <p>キャンバス上で2点をタップして、その距離の実寸(mm)を入力してください。</p>
   <button id="setScaleBtn">縮尺を設定する（線を2点クリック）</button>
   <div id="scaleInfo">まだ縮尺は設定されていません。</div>
+
   <div class="stepButtons">
     <button id="backToStep1" class="backBtn">戻る（STEP1へ）</button>
     <button id="goStep3" class="nextBtn" disabled>次へ（STEP3へ）</button>
@@ -45,7 +50,7 @@
 
 <!-- STEP 3 -->
 <div class="step" id="step3" style="display:none;">
-  <h2>STEP 3：家具を追加・操作・保存・共有</h2>
+  <h2>STEP 3：家具追加・操作・保存・共有</h2>
 
   <h3>家具の基本色</h3>
   <input type="color" id="colorPicker" value="#888888">
@@ -74,7 +79,7 @@
   <button class="presetBtn" data-type="fridgeLarge">冷蔵庫（大：600×700mm）</button>
   <button class="presetBtn" data-type="washer">洗濯機（600×600mm）</button>
 
-  <h3>自分で家具を作る</h3>
+  <h3>自作家具</h3>
   <label>名前：</label>
   <input type="text" id="customName"><br>
   <label>幅(mm)：</label>
@@ -88,10 +93,11 @@
   <h3>選択中の家具操作</h3>
   <button id="deleteSelectedBtn" class="dangerBtn" disabled>選択中の家具を削除</button>
 
-  <h3>キャンバス保存・共有・読み込み</h3>
+  <h3>保存・共有・読み込み</h3>
   <button id="saveImageBtn">画像として保存（PNG）</button>
-  <button id="shareImageBtn">画像を共有（LINE/SNSなど）</button>
+  <button id="shareImageBtn">画像を共有（LINE/SNS）</button>
   <button id="saveProjectBtn">プロジェクト保存（JSON）</button>
+
   <input type="file" id="loadProjectInput" accept="application/json">
   <label for="loadProjectInput" class="fileLabel">プロジェクト読み込み（JSON）</label>
 
