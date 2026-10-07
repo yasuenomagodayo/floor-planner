@@ -64,7 +64,8 @@ button {
   border-radius: 4px;
 }
 
-#loadProjectInput {
+#loadProjectInput,
+#loadProjectInputStep1 {
   display: none;
 }
 
@@ -72,7 +73,7 @@ button {
   border: 1px solid #333;
   margin-top: 10px;
   max-width: 100%;
-  touch-action: none; /* STEP3でドラッグ・回転に使う */
+  touch-action: auto; /* ← スクロール可能にする */
 }
 
 #scaleInfo {
